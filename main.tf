@@ -50,6 +50,15 @@ data "vcd_nsxt_security_group" "security_groups" {
   name            = each.value
 }
 
+locals {
+  id_lookup = merge(
+    { for name, profile in data.vcd_nsxt_app_port_profile.app_port_profiles : name => profile.id },
+    { for name, group in data.vcd_nsxt_security_group.security_groups : name => group.id },
+    { for name, group in data.vcd_nsxt_dynamic_security_group.dynamic_security_groups : name => group.id },
+    { for name, set in data.vcd_nsxt_ip_set.ip_sets : name => set.id }
+  )
+}
+
 resource "vcd_nsxt_firewall" "edge_firewall" {
   edge_gateway_id = data.vcd_nsxt_edgegateway.edge_gateway.id
 
@@ -62,9 +71,9 @@ resource "vcd_nsxt_firewall" "edge_firewall" {
       action               = rule.value["action"]
       enabled              = lookup(rule.value, "enabled", true)
       logging              = lookup(rule.value, "logging", false)
-      source_ids           = try(length(rule.value["source_ids"]), 0) > 0 ? [for id in rule.value["source_ids"]: try(data.vcd_nsxt_security_group.security_groups[id].id, try(data.vcd_nsxt_dynamic_security_group.dynamic_security_groups[id].id, data.vcd_nsxt_ip_set.ip_sets[id].id)) if id != null && id != ""] : null
-      destination_ids      = try(length(rule.value["destination_ids"]), 0) > 0 ? [for id in rule.value["destination_ids"]: try(data.vcd_nsxt_security_group.security_groups[id].id, try(data.vcd_nsxt_dynamic_security_group.dynamic_security_groups[id].id, data.vcd_nsxt_ip_set.ip_sets[id].id)) if id != null && id != ""] : null
-      app_port_profile_ids = try(length(rule.value["app_port_profile_ids"]), 0) > 0 ? [for name in rule.value["app_port_profile_ids"]: data.vcd_nsxt_app_port_profile.app_port_profiles[name].id if name != null && name != ""] : null
+      source_ids           = try(length(rule.value["source_ids"]), 0) > 0 ? [for name in rule.value["source_ids"]: local.id_lookup[name] if contains(keys(local.id_lookup), name) && name != null && name != ""] : null
+      destination_ids      = try(length(rule.value["destination_ids"]), 0) > 0 ? [for name in rule.value["destination_ids"]: local.id_lookup[name] if contains(keys(local.id_lookup), name) && name != null && name != ""] : null
+      app_port_profile_ids = try(length(rule.value["app_port_profile_ids"]), 0) > 0 ? [for name in rule.value["app_port_profile_ids"]: local.id_lookup[name] if contains(keys(local.id_lookup), name) && name != null && name != ""] : null
     }
   }
 }

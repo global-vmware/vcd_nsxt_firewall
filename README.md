@@ -25,7 +25,7 @@ This Terraform module deploys NSX-T Edge Gateway Firewall Rules into an existing
 | vdc_org_name | The name of the Data Center Group Organization in VCD | string | `"Organization Name Format: <Account_Number>-<Region>-<Account_Name>"` | yes |
 | vdc_group_name | The name of the Data Center Group in VCD | string | `"Data Center Group Name Format: <Account_Number>-<Region>-<Account_Name> <datacenter group>"` | yes |
 | vdc_edge_name | Name of the Data Center Group Edge Gateway | string | `"Edge Gateway Name Format: <Account_Number>-<Region>-<Edge_GW_Identifier>-<edge>"` | yes |
-| app_port_profiles | Map of app port profiles with their corresponding scopes | map(string) | {} | no |
+| app_port_profiles | Map of app port profiles with their corresponding scopes | map(string) | {} | yes |
 | ip_set_names | List of IP set names | list(string) | [] | yes |
 | dynamic_security_group_names | List of dynamic security group names | list(string) | [] | no |
 | security_group_names | List of security group names | list(string) | [] | no |
@@ -42,7 +42,7 @@ This Terraform module deploys NSX-T Edge Gateway Firewall Rules into an existing
 
 ```terraform
 module "vcd_nsxt_firewall" {
-  source = "github.com/global-vmware/vcd_nsxt_firewall.git?ref=v1.1.0"
+  source = "github.com/global-vmware/vcd_nsxt_firewall.git?ref=v1.3.0"
 
   vdc_org_name          = "<VDC-ORG-NAME>"
   vdc_group_name        = "<VDC-GRP-NAME>"
