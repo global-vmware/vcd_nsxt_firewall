@@ -42,7 +42,7 @@ This Terraform module deploys NSX-T Edge Gateway Firewall Rules into an existing
 
 ```terraform
 module "vcd_nsxt_firewall" {
-  source = "github.com/global-vmware/vcd_nsxt_firewall.git?ref=v1.3.0"
+  source = "github.com/global-vmware/vcd_nsxt_firewall.git?ref=v1.3.1"
 
   vdc_org_name          = "<VDC-ORG-NAME>"
   vdc_group_name        = "<VDC-GRP-NAME>"
